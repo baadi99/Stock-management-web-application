@@ -33,8 +33,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         //Setting up an isAdmin blade directive
-        Blade::if('isAdmin', function ($role_id) {
-            return $role_id == 1;
+        Blade::if('isAdmin', function ($role) {
+            return $role === 'Admin';
         });
     }
 }

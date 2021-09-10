@@ -8,7 +8,7 @@
           <div class="row align-items-center py-4">
             <div class="col-lg-12 col-7">
               <nav aria-label="breadcrumb" class="d-inline-block">
-                <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2">
+                <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2 text-xs">
                   <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                   <li class="breadcrumb-item"><a href="{{ route('employees') }}">Employees</a></li>
                   <li class="breadcrumb-item active" aria-current="page">Add employee</li>
@@ -98,6 +98,7 @@
                       <div class="form-group">
                         <label class="form-control-label" for="password">Password</label>
                         <input type="text" id="password" class="form-control" placeholder="Password" name="password">
+                        <small class="text-xs">*Auto-generated password</small>
                       </div>
                     </div>
                     <div class="col-lg-6">
@@ -105,8 +106,9 @@
                           <label class="form-control-label" for="role">Role</label>
                           <select class="form-control" id="role" name="role_id">
                             <option disabled>--Select Role--</option>
-                            <option value="1">Admin</option>
-                            <option value="2">Employee</option>
+                            @foreach ($roles as $role)
+                                <option value="{{$role->id}}">{{$role->role}}</option>
+                            @endforeach
                           </select>
                         </div>
                     </div>
@@ -128,18 +130,18 @@
     <script>
       //A function to generate passwords so the admin doesn't have to enter them manually
       function generatePassword(){
-        var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&^*()";
-        var length = 10;
-        var password  = "";
-        for (let i = 0, n = chars.length; i < length; i++) {
-          password += chars.charAt(Math.floor(Math.random() * n));
+        let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&^*()";
+        const len = chars.length;
+        const passwordLength = 10;
+        let password  = "";
+        for (let i = 0; i < passwordLength; i++) {
+          password += chars.charAt(Math.floor(Math.random() * len));
         }
         return password;
       }
 
-      window.onload = function(){
-        var passwordField = document.getElementById('password');
-        password.setAttribute('value', generatePassword());
+      window.onload = () => {
+        document.getElementById('password').setAttribute('value', generatePassword());
       }
     </script>
 @endsection

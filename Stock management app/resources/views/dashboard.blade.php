@@ -8,7 +8,7 @@
         <div class="row align-items-center py-4">
           <div class="col-lg-6 col-8">
             <nav aria-label="breadcrumb" class="d-md-inline-block">
-              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2">
+              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2 text-xs">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                 <li class="breadcrumb-item" ><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Overview</li>
@@ -34,10 +34,12 @@
                       </div>
                     </div>
                   </div>
-                  <p class="mt-1 mb-0 text-xs small">
-                    <span class="badge badge-dot text-xs small"><i class="bg-warning mr-0"></i> {{ $lowInStock }}</span>
-                    <span class="text-nowrap small">Low in stock</span>
-                  </p>
+                  @if($lowInStock !== 0)
+                    <p class="mt-1 mb-0 text-xs small">
+                      <span class="badge badge-dot text-xs"><i class="bg-warning mr-0"></i></span>
+                      <span class="text-nowrap small"> {{ $lowInStock }} Low in stock</span>
+                    </p>
+                  @endif
                 </div>
               </div>
             </div>
@@ -74,10 +76,6 @@
                       </div>
                     </div>
                   </div>
-                  {{-- <p class="mt-3 mb-0 text-xs">
-                    <span class="text-success mr-1"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                    <span class="text-nowrap">Compared to last month</span>
-                  </p> --}}
                 </div>
               </div>
             </div>

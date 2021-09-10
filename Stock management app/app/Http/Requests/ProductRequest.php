@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProductRequest extends FormRequest
 {
@@ -23,14 +24,22 @@ class ProductRequest extends FormRequest
      */
     public function rules()
     {
+        //Adding the unique rule dynamically, this solves the problem of product already exist
+        //when updating a product
+
+        $label_rules = array(0 => 'required');
+        if(request()->isMethod('POST')){
+            array_push($label_rules, 'unique:products');
+        } 
+
         return [
-            'label' => 'required',
+            'label' => $label_rules,
             'description' => 'required',
             'category_id' => 'required',
-            'quantity' => 'required',
+            'quantity' => 'required|numeric|min:1',
             'supplier_id' => 'required',
-            'buying_cost' => 'required',
-            'selling_cost' => 'required'
+            'buying_cost' => 'required|numeric|min:1',
+            'selling_cost' => 'required|numeric|min:1'
         ];
     }
     /**
@@ -39,7 +48,8 @@ class ProductRequest extends FormRequest
     public function messages()
     {
         return [
-            'label.unique' => 'Product already exists.'
+            'label.unique' => 'Product already exists!',
+            'quantity.min' => 'Please choose a higher quantity!'
         ];
     }
 }

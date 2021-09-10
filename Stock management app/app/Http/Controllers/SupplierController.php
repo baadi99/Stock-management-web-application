@@ -28,6 +28,7 @@ class SupplierController extends Controller
      * Store the newly added supplier
      */
     function store(SupplierRequest $request){
+
         Supplier::create($request->all());
         return back()->with('success', 'Supplier added successfully!');
     }
@@ -35,9 +36,7 @@ class SupplierController extends Controller
     /**
      * Displaying the form for updating supplier info
     */
-    function edit($id){
-        //Retrieve supplier info from Database
-        $supplier = Supplier::find($id);
+    function edit(Supplier $supplier) {
 
         return view('suppliers.edit', ['supplier' => $supplier]);
     }
@@ -45,14 +44,13 @@ class SupplierController extends Controller
     /**
      * Updating supplier info
     */
-    function update(SupplierRequest $request, $id){
-        // Retrieving the product
-        $supplier = Supplier::find($id);
+    function update(SupplierRequest $request, Supplier $supplier) {
+
         //Updating the fields
         $supplier->first_name =  $request->first_name;
         $supplier->last_name = $request->last_name;
         $supplier->email = $request->email;
-        $supplier->address = $request->address;
+        $supplier->address->address = $request->address;
         $supplier->phone_number = $request->phone_number;
         $supplier->save();
         //If updated successully redirect back with success message
@@ -62,9 +60,9 @@ class SupplierController extends Controller
     /**
      * Deleting supplier
     */
-    function delete($id){
-        //Retrieving the supplier from database and deleting it
-        Supplier::destroy($id);
+    function delete(Supplier $supplier) {
+
+        $supplier->delete();
         return back()->with('succees','Supplier deleted successfully!');
     }
 }

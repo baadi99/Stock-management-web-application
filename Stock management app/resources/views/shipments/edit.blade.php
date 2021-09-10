@@ -8,7 +8,7 @@
         <div class="row align-items-center py-4">
           <div class="col-lg-12 col-7">
             <nav aria-label="breadcrumb" class="d-inline-block">
-              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2">
+              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2 text-xs">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                 <li class="breadcrumb-item"><a href="{{ route('shipments') }}">Shipments</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Edit shipment</li>

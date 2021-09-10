@@ -9,7 +9,7 @@
           <div class="row align-items-center py-4">
             <div class="col-lg-6 col-7">
               <nav aria-label="breadcrumb" class="d-inline-block">
-                <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2">
+                <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2 text-xs">
                   <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                   <li class="breadcrumb-item"><a href="{{ route('suppliers') }}">Suppliers</a></li>
                   <li class="breadcrumb-item active" aria-current="page">Index</li>
@@ -37,6 +37,7 @@
                   <tr>
                     <th scope="col" class="sort" data-sort="id">#ID</th>
                     <th scope="col" class="sort" data-sort="supplier">Supplier</th>
+                    <th scope="col" class="sort" data-sort="address">Address</th>
                     <th scope="col" class="sort" data-sort="email">Email</th>
                     <th scope="col" class="sort" data-sort="phone">Phone number</th>
                     <th scope="col">Action</th>
@@ -47,6 +48,7 @@
                      <tr>
                         <th>{{ $supplier->id }}</th>
                         <td>{{ $supplier->first_name }} {{ $supplier->last_name }}</td>                
+                        <td>{{ $supplier->address->address }}</td>                
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->phone_number }}</td>
                         <td>

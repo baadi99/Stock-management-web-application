@@ -23,12 +23,20 @@ class SupplierRequest extends FormRequest
      */
     public function rules()
     {
+        //Solves the 'email/phone number already exists problem when trying to update existing suppliers
+        $emailRules = array('required', 'email');
+        $phoneRules = array('required');
+        if(request()->isMethod('POST')) {
+            array_push($emailRules, 'unique:suppliers');
+            array_push($phoneRules, 'unique:suppliers');
+        }
+
         return [
             'first_name' => 'required|string|min:3',
             'last_name' => 'required|string|min:3',
-            'email' => 'required|email',
+            'email' => $emailRules,
             'address' => 'required',
-            'phone_number' => 'required'
+            'phone_number' => $phoneRules
         ];
     }
 
@@ -38,7 +46,7 @@ class SupplierRequest extends FormRequest
     public function messages()
     {
         return [
-            'email.unique' => 'Supplier already exists.'
+            
         ];
     }
 }

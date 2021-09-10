@@ -23,66 +23,68 @@ Route::get('/', function () {
 });
 
 Route::get('login', [UserAuthController::class, 'login'])->name('login')->middleware('isAlreadyLoggedIn');
-Route::post('checkCredentials', [UserAuthController::class, 'checkCredentials'])->name('checkCredentials');
+Route::post('login', [UserAuthController::class, 'checkCredentials'])->name('checkCredentials');
 
 
 
 Route::middleware('isLoggedIn')->group(function () {
     
     Route::get('profile', [UserAuthController::class, 'profile'])->name('profile');
-    Route::patch('profile', [UserAuthController::class, 'update'])->name('profile.update');
+    Route::patch('profile/{user}', [UserAuthController::class, 'update'])->name('profile.update');
     Route::get('logout', [UserAuthController::class, 'logout'])->name('logout');
 
     // Shipments CRUD operations
     Route::prefix('shipments')->group(function () {
-        Route::get('/', [ShipmentController::class, 'index'])->name('shipments');
-        Route::get('/add', [ShipmentController::class, 'add'])->name('shipments.add');
-        Route::post('/add', [ShipmentController::class, 'store'])->name('shipments.store');
-        Route::get('/{id}/edit', [ShipmentController::class, 'edit'])->name('shipments.edit');
-        Route::patch('/{id}/edit', [ShipmentController::class, 'update'])->name('shipments.update');
-        Route::patch('/{id}/complete', [ShipmentController::class, 'markAsComplete'])->name('shipments.markAsComplete');
-        Route::delete('/{id}/delete', [ShipmentController::class, 'delete'])->name('shipments.delete');
+        Route::get('/index', [ShipmentController::class, 'index'])->name('shipments');
+        Route::get('/', [ShipmentController::class, 'add'])->name('shipments.add');
+        Route::post('/', [ShipmentController::class, 'store'])->name('shipments.store');
+        Route::get('/{shipment}', [ShipmentController::class, 'edit'])->name('shipments.edit');
+        Route::patch('/{shipment}', [ShipmentController::class, 'update'])->name('shipments.update');
+        Route::patch('/{shipment}/completed', [ShipmentController::class, 'markAsComplete'])->name('shipments.markAsComplete');
+        Route::delete('/{shipment}', [ShipmentController::class, 'delete'])->name('shipments.delete');
     });
     
     // Products CRUD operations
     Route::prefix('products')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('products');
-        Route::get('/add', [ProductController::class, 'add'])->name('products.add');
-        Route::post('/add', [ProductController::class, 'store'])->name('products.store');
-        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
-        Route::patch('/{id}/edit', [ProductController::class, 'update'])->name('products.update');
-        Route::delete('{id}/delete', [ProductController::class, 'delete'])->name('products.delete');
+        Route::get('/index', [ProductController::class, 'index'])->name('products');
+        Route::get('/', [ProductController::class, 'add'])->name('products.add');
+        Route::post('/', [ProductController::class, 'store'])->name('products.store');
+        Route::get('/{product}', [ProductController::class, 'edit'])->name('products.edit');
+        Route::patch('/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('{product}', [ProductController::class, 'delete'])->name('products.delete');
     });
+
     //Reserved to admin
     Route::middleware('isAdmin')->group(function() {
 
         Route::get('dashboard', [UserAuthController::class, 'dashboard'])->name('dashboard');
+        
         // Employees CRUD operations
         Route::prefix('employees')->group(function () {
-            Route::get('/', [EmployeeController::class, 'index'])->name('employees');
-            Route::get('/add', [EmployeeController::class, 'add'])->name('employees.add');
-            Route::post('/add', [EmployeeController::class, 'store'])->name('employees.store');
-            Route::get('/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
-            Route::patch('/{id}/edit', [EmployeeController::class, 'update'])->name('employees.update');
-            Route::delete('{id}/delete', [EmployeeController::class, 'delete'])->name('employees.delete');
+            Route::get('/index', [EmployeeController::class, 'index'])->name('employees');
+            Route::get('/', [EmployeeController::class, 'add'])->name('employees.add');
+            Route::post('/', [EmployeeController::class, 'store'])->name('employees.store');
+            Route::get('/{employee}', [EmployeeController::class, 'edit'])->name('employees.edit');
+            Route::patch('/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+            Route::delete('{employee}', [EmployeeController::class, 'delete'])->name('employees.delete');
         });
 
         // Suppliers CRUD operations
         Route::prefix('suppliers')->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('suppliers');
-            Route::get('/add', [SupplierController::class, 'add'])->name('suppliers.add');
-            Route::post('/add', [SupplierController::class, 'store'])->name('suppliers.store');
-            Route::get('/{id}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
-            Route::patch('/{id}/edit', [SupplierController::class, 'update'])->name('suppliers.update');
-            Route::delete('/{id}/delete', [SupplierController::class, 'delete'])->name('suppliers.delete');
+            Route::get('/index', [SupplierController::class, 'index'])->name('suppliers');
+            Route::get('/', [SupplierController::class, 'add'])->name('suppliers.add');
+            Route::post('/', [SupplierController::class, 'store'])->name('suppliers.store');
+            Route::get('/{supplier}', [SupplierController::class, 'edit'])->name('suppliers.edit');
+            Route::patch('/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+            Route::delete('/{supplier}', [SupplierController::class, 'delete'])->name('suppliers.delete');
         });
 
-        //Invoices 
+        //Invoices operations
         Route::prefix('invoices')->group(function () {
             Route::get('/', [InvoiceController::class, 'index'])->name('invoices');
-            Route::patch('/{id}/paid', [InvoiceController::class, 'markAsPaid'])->name('invoice.markAsPaid');
-            Route::get('/{id}/print', [InvoiceController::class, 'print'])->name('invoice.print');
-            Route::delete('/{id}/delete', [InvoiceController::class, 'delete'])->name('invoice.delete');
+            Route::patch('/{invoice}', [InvoiceController::class, 'markAsPaid'])->name('invoice.markAsPaid');
+            Route::get('/{invoice}', [InvoiceController::class, 'print'])->name('invoice.print');
+            Route::delete('/{invoice}', [InvoiceController::class, 'delete'])->name('invoice.delete');
         });
     });
 

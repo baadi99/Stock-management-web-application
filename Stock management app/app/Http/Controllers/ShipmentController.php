@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\ShipmentRequest;
 use App\Models\Shipment;
 use App\Models\ShipmentTypes;
 use App\Models\Product;
@@ -32,15 +33,8 @@ class ShipmentController extends Controller
     /**
      * Storing the newly added shipment
      */
-    function store(Request $request){
-        //Validating input
-        $request->validate([
-           'date' => 'required|date',
-           'shipment_type_id' => 'required',
-           'quantity' => 'required',
-           'product_id' => 'required',
-           'total_price' => 'required'
-        ]);
+    function store(ShipmentRequest $request){
+
         //When the quantity available in stock is insufficient when making an outgoing shipment
         $shipment_type = ShipmentTypes::find($request->shipment_type_id);
         if($shipment_type->type === "Outgoing"){
@@ -49,52 +43,64 @@ class ShipmentController extends Controller
                 return back()->withErrors('The quantity available in stock is insufficient (in stock : '.$product->quantity.')');
             }
         }
-        //store the newly added product and return a success message
-        Shipment::create($request->all());
-        return redirect()->back()->with('success', 'Shipment added successfully!');
+
+        try {
+
+            //store the newly added product and return a success message
+            Shipment::create($request->all());
+
+        } catch(\Exception $e) {
+            return back()->withErrors('Something went wrong!');
+        }
+
+        return back()->with('success', 'Shipment added successfully!');
+        
     }
 
     /**
      * Displaying the form for updating a shipment
     */
-    function edit($id){
+    function edit(Shipment $shipment){
         // Retrieving shipment types
         $shipmentTypes = ShipmentTypes::get();
         // Retrieving products
         $products = Product::get();
-        //Retrieving the product info 
-        $shipment = Shipment::find($id);
+
         return view('shipments.edit', ['shipment' => $shipment, 'shipmentTypes' => $shipmentTypes, 'products' => $products]);
     }
 
     /**
      * Updating a shipment
     */
-    function update(Request $request, $id){
-        //Validation 
-        $request->validate([
-            'date' => 'required|date',
-            'shipment_type_id' => 'required',
-            'quantity' => 'required',
-            'product_id' => 'required',
-            'total_price' => 'required'
-         ]);
-        // Retrieving the shipment
-        $shipment = Shipment::find($id);
+    function update(ShipmentRequest $request, Shipment $shipment){
+
+        //Determine if the shipment is completed
+        if($shipment->finalized === 1) {
+            return back()->withErrors('This shipment is completed and can\'t be modified!');
+        }
+
         //Updating the fields
-        $shipment->date =  $request->date;
+        $shipment->date = $request->date;
         $shipment->shipment_type_id = $request->shipment_type_id;
         $shipment->product_id = $request->product_id;
-        //When the quantity available in stock is insufficient when making an outgoing shipment
+        //display an error when the quantity available in stock is insufficient
+        // when making an outgoing shipment
         if($shipment->shipment_type->type === "Outgoing"){
             
-            if($request->quantity > $shipment->product->quantity){
+            if($request->quantity > $shipment->product->quantity + $shipment->quantity){
                 return back()->withErrors('The quantity available in stock is insufficient(in stock : '.$shipment->product->quantity.')');
             }
         }
+
         $shipment->quantity = $request->quantity;
         $shipment->total_price = $request->total_price;
-        $shipment->save();
+
+        try {
+            $shipment->save();
+        } catch(\Exception $e) {
+            return back()->withErrors('Something went wrong!');
+        }
+        
         //If updated successully redirect back with success message
         return back()->with('success', 'Shipment updated successfully!');
     }
@@ -102,9 +108,13 @@ class ShipmentController extends Controller
     /**
      * Marking a shipment as complete and change database data accordingly
      */
-    function markAsComplete($id){
-        // Retrieving the shipment
-        $shipment = Shipment::find($id);
+    function markAsComplete(Shipment $shipment){
+
+        //Check if the shipment is already completed
+        // to avoid re"completion"
+        if($shipment->finalized === 1) {
+            return back();
+        }
         //updating database
         if($shipment->shipment_type->type === "Outgoing"){
             //Subtract the quantity from stock
@@ -115,7 +125,7 @@ class ShipmentController extends Controller
             //Add the quantity to stock
             $shipment->product->quantity += $shipment->quantity;
             $shipment->product->save();
-            //Create an incoice
+            //Create an invoice
             $invoice = new Invoice;
             $invoice->supplier_id = $shipment->product->supplier_id;
             $invoice->amount = $shipment->total_price;
@@ -130,9 +140,9 @@ class ShipmentController extends Controller
     /**
      * Deleting a shipment 
     */
-    function delete($id){
-        //Retrieving the shipment from database and deleting it
-        Shipment::destroy($id);
+    function delete(Shipment $shipment){
+
+        $shipment->delete();
         return back();
     }
 }

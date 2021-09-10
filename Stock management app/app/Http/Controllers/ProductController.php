@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
-
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Category;
@@ -39,33 +38,38 @@ class ProductController extends Controller
     function store(ProductRequest $request){
         //If the request is valid(validation is done in ProductRequest class) 
         //store the newly added product and return a success message
-        Product::create($request->all());
+        try {
+            
+            Product::create($request->all());
+    
+        } catch (\Exception $e) {
+            return back()->withErrors('Something went wrong!');
+        }
+
         return back()->with('success', 'Product added successfully!');
     }
 
     /**
      * Displaying the form for updating a product
     */
-    function edit($id){
+    function edit(Product $product) {
         // Retrieving categories and suppliers
         $categories = Category::get();
         $suppliers = Supplier::select(array('id', 'first_name', 'last_name'))->get();
-        //Retrieving the product info 
-        $product = Product::find($id);
+
         return view('products.edit', ['product' => $product, 'categories' => $categories, 'suppliers' => $suppliers]);
     }
 
     /**
      * Updating a product
     */
-    function update(ProductRequest $request, $id){
-        // Retrieving the product
-        $product = Product::find($id);
+    function update(ProductRequest $request, Product $product) {
+
         //Updating the fields
         $product->label =  $request->label;
         $product->description = $request->description;
         $product->category_id = $request->category_id;
-        $product->quantity = $request-> quantity;
+        $product->quantity = $request->quantity;
         $product->supplier_id = $request->supplier_id;
         $product->buying_cost = $request->buying_cost;
         $product->selling_cost = $request->selling_cost;
@@ -77,9 +81,9 @@ class ProductController extends Controller
     /**
      * Deleting a product 
     */
-    function delete($id){
-        //Retrieving the product from database and deleting it
-        Product::destroy($id);
+    function delete(Product $product) {
+
+        $product->delete();
         return back()->with('succees','Deleted successfully!');
     }
 }

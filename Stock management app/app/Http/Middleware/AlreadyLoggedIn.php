@@ -16,6 +16,7 @@ class AlreadyLoggedIn
      */
     public function handle(Request $request, Closure $next)
     {
+        // When the user is trying to log in check first if they already logged in or not
         if( session()->has('LoggedUser') && (url('login') == $request->url()) ){
             return back();
         }

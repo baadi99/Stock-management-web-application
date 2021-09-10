@@ -19,9 +19,8 @@ class InvoiceController extends Controller
     /**
      * Mark an invoice as paid
      */
-    function markAsPaid($id){
-        //Retrieve the invoice
-        $invoice = Invoice::find($id);
+    function markAsPaid(Invoice $invoice) {
+
         //Set the finalized column to 1 (true) and save changes
         $invoice->finalized = 1; //1 = true
         $invoice->save();
@@ -32,19 +31,17 @@ class InvoiceController extends Controller
     /**
      * Downloading/printing an invoice
      */
-    function print($id){
+    function print(Invoice $invoice) {
         
-        $invoice = Invoice::find($id);
-        //return view('invoices.print', ['invoice' => $invoice]);
         $pdf = PDF::loadView('invoices.print', ['invoice' => $invoice]);
         return $pdf->stream('invoice.pdf');
     }
     /**
      * Deleting an invoice
     */
-    function delete($id){
-        //Retrieving the shipment from database and deleting it
-        Invoice::destroy($id);
+    function delete(Invoice $invoice) {
+
+        $invoice->delete();
         return back();
     }
 }

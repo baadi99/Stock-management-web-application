@@ -8,7 +8,7 @@
         <div class="row align-items-center py-4">
           <div class="col-lg-6 col-7">
             <nav aria-label="breadcrumb" class="d-md-inline-block">
-              <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <ol class="breadcrumb breadcrumb-links breadcrumb-dark text-xs">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                 <li class="breadcrumb-item"><a href="{{ route('profile') }}">Profile</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Edit profile</li>
@@ -46,7 +46,7 @@
                            {{Session::get('success')}}
                            </div>
                    @endif
-            <form action="{{ route('profile.update') }}" method="POST" name="form">
+            <form action="{{ route('profile.update', $user->id) }}" method="POST" name="form">
               @method('PATCH')
               @csrf
               <h6 class="heading-small text-muted mb-4">Profile</h6>
@@ -82,7 +82,7 @@
                   <div class="col-md-12">
                     <div class="form-group">
                      <label class="form-control-label" for="address">Address</label>
-                     <input type="text" id="address" class="form-control" placeholder="Address" name="address" value="{{ $user->address }}">
+                     <input type="text" id="address" class="form-control" placeholder="Address" name="address" value="{{ $user->address->address }}">
                     </div>
                   </div>
                 </div>

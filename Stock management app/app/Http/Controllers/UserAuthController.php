@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Shipment;
+use App\Http\Requests\UserRequest;
 
 class UserAuthController extends Controller
 {
@@ -20,17 +21,11 @@ class UserAuthController extends Controller
 
     /**
      * On form submission check if the credentials entered are valid, 
-     * and redirect to dashboard otherwise show the redirect back 
+     * and redirect to dashboard otherwise  redirect back 
      * to the form with the corresponding errors
      */
-    function checkCredentials(Request $request){
+    function checkCredentials(UserRequest $request){
        
-        //Validating the request data 
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]); 
-
         //if validated check if user exists in database
         $user = User::where('email', $request->email)->first();
         if($user){
@@ -39,12 +34,13 @@ class UserAuthController extends Controller
                 //if password is correct store the user's id and role id in
                 // session variables and redirect to dashboard
                 $request->session()->put('LoggedUser', $user->id);
-                $request->session()->put('Role_id', $user->role_id);
-                if($user->role_id === 1)
+                $request->session()->put('user_role', $user->role->role);
+                if($user->role->id === 1){
                     return redirect('dashboard');
-                else
+                } else {
                     return redirect('products');
-
+                }
+                    
             }else {
                 //if the passwor is invalid redirect back with the corresponding error
                 return back()->withErrors('Incorrect password!');
@@ -65,49 +61,33 @@ class UserAuthController extends Controller
         $lastShipments = Shipment::where('finalized', 0)->orderByDesc('date')->limit(5)->get();
         //Sales data :
         $currentMonthNbSales = Shipment::where('shipment_type_id', 2) 
-                                     ->whereMonth('date', date('m'))
-                                     ->whereYear('date', date('Y'))
-                                     ->count();  
+                                        ->whereMonth('date', date('m'))
+                                        ->whereYear('date', date('Y'))
+                                        ->count();  
 
-        $currentYearProfits = collect([]); //A collection where we will store profits
-        //Sales data :
-        for($i = 1; $i <= 12; $i++){
-            $currentMonthSales = Shipment::where('shipment_type_id', 2)  // 2 = "Outgoing"
-                                            ->whereMonth('date', $i)
-                                            ->whereYear('date', date('Y'))
-                                            ->get();
-            
-             //Calculating profit :
-            $monthProfit = 0;
-            //If there are sales in current month calculate its profit otherwise profit is 0                                
-            if(!$currentMonthSales->isEmpty()){
-                
-                foreach($currentMonthSales as $sale){
-                    //in each sale we substract the base price(buying cost) from the total price
-                    $monthProfit += ( $sale->total_price - ($sale->quantity * $sale->product->buying_cost) );
-                    $monthProfit = number_format($monthProfit/1000,2); //The data will be displayed in the number k/M format(e.g : 10.0k/10M)
-                }   
-            }
-            //Append profit to profits collection
-            $currentYearProfits = $currentYearProfits->concat([$monthProfit]);                               
-        } 
+        // Get the profits of the current year
+        $currentYearProfits = $this->getCurrentYearProfits();
+
+        // Calculate growth :
+
         //Retrieving current month's profit, the date('m') method returns the current month
         //and since collections start at index 0 we need to subtract 1 to get the index of current month's profit
         $currentMonthProfit = $currentYearProfits->get(date('m') - 1);
         $lastMonthProfit = $currentYearProfits->get(date('m') - 2);
-        //Calculating growth(how much the profits has been grown)
-        $growth = number_format((($currentMonthProfit - $lastMonthProfit)*100)/$lastMonthProfit, 2);                       
+
+        $growth = $this->calculateGrowth($lastMonthProfit, $currentMonthProfit);                       
         
         //Passing data to dashboard 
-        return view('dashboard', ['productsInStock' => $totalProducts,
-                                  'lowInStock' => $lowInStock, 
-                                  'pendingShipments' => $pendingShipments,
-                                  'currentMonthSales' => $currentMonthNbSales,
-                                  'lastShipments' => $lastShipments,
-                                  'currentMonthProfit' => $currentMonthProfit,
-                                  'growth' => $growth,
-                                  'currentYearProfits' => $currentYearProfits
-                                  ]);
+        return view('dashboard',[
+                                    'productsInStock' => $totalProducts,
+                                    'lowInStock' => $lowInStock, 
+                                    'pendingShipments' => $pendingShipments,
+                                    'currentMonthSales' => $currentMonthNbSales,
+                                    'lastShipments' => $lastShipments,
+                                    'currentMonthProfit' => $currentMonthProfit,
+                                    'growth' => $growth,
+                                    'currentYearProfits' => $currentYearProfits
+                                ]);
     }
 
     /**
@@ -124,37 +104,26 @@ class UserAuthController extends Controller
     /**
      * Updating profile data
      */
-    function update(Request $request){
-        //Validation
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'address' => 'required',
-            'phone_number' => 'required',
-            'email' => 'required|email',
-            'password' => 'required'
-        ]); 
-        //Updating 
-        $user = User::find(session('LoggedUser'));
+    function update(UserRequest $request, User $user){
 
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
-        $user->address = $request->address;
+        $user->address->address = $request->address;
         $user->phone_number = $request->phone_number;
         
-        if(Hash::check($request->password, $user->password)){
+        if(Hash::check($request->password, $user->password)) {
             //If password is correct and new password is empty just save changes
-            if($request->newPassword == ""){
+            if($request->newPassword == "") {
                 $user->save();
                 return back()->with('success', 'Profile updated successfully!');
             //if the new password field isn't empty(changing password) then update the password
-            }else{
+            }else {
                 $user->password = Hash::make($request->newPassword);
                 $user->save();
                 return back()->with('success', 'Profile updated successfully!');
             }    
-        }else{
+        }else {
             return back()->withErrors('Incorrect password!');
         }
         
@@ -166,9 +135,51 @@ class UserAuthController extends Controller
     function logout(){
         if(session()->has('LoggedUser')){
             //delete the LoggedUser item from the session
-            session()->pull('LoggedUser');
-            //redirect to login page
-            return redirect('login');
+            session()->flush();
         }
+        //whether the user is logged in or not redirect to login page
+        return redirect('login');
+    }
+
+    /**
+     * A helper function to calculate the profits of the current year
+     * 
+     */
+    function getCurrentYearProfits(){
+
+        $currentYearProfits = collect([]); //A collection where we will store profits
+        //Sales data :
+        for($i = 1; $i <= 12; $i++){
+            $currentMonthSales = Shipment::where('shipment_type_id', 2)  // 2 = "Outgoing"
+                                            ->whereMonth('date', $i)
+                                            ->whereYear('date', date('Y'))
+                                            ->get();
+            
+            //Calculating profit :
+            $monthProfit = 0;
+            //If there are sales in current month calculate its profit otherwise profit is 0                                
+            if(!$currentMonthSales->isEmpty()){
+                
+                foreach($currentMonthSales as $sale){
+                    //in each sale we substract the base price(buying cost) from the total price
+                    $monthProfit += ( $sale->total_price - ($sale->quantity * $sale->product->buying_cost) );
+                    $monthProfit = number_format($monthProfit/1000, 2); //The data will be displayed in the number k/M format(e.g : 10.0k/10M)
+                }   
+            }
+            //Append profit to profits collection
+            $currentYearProfits = $currentYearProfits->concat([$monthProfit]);                               
+        }
+
+        return $currentYearProfits;
+    }
+
+    /**
+     * Calculating growth(how much the profits has been grown)
+     */
+
+    function calculateGrowth($lastMonthProfit, $currentMonthProfit){
+
+        // Needs more handling when lastMonthProfit = 0 instead of just returning 1
+        return number_format((($currentMonthProfit - $lastMonthProfit)*100)/($lastMonthProfit || 1), 2);
     }
 }

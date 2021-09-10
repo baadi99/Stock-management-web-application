@@ -74,7 +74,7 @@
                         @endforeach 
                     </div>
               @endif
-              <form role="form" action="{{ route('checkCredentials') }}" method="post">
+              <form role="form" action="{{ route('checkCredentials') }}" method="POST">
               @csrf
                 <div class="form-group mb-3">
                   <div class="input-group input-group-merge input-group-alternative">

@@ -8,7 +8,7 @@
         <div class="row align-items-center py-4">
           <div class="col-lg-12 col-7">
             <nav aria-label="breadcrumb" class="d-inline-block">
-              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2">
+              <ol class="breadcrumb breadcrumb-links breadcrumb-dark py-2 text-xs">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i></a></li>
                 <li class="breadcrumb-item"><a href="{{ route('products') }}">Products</a></li>
                 <li class="breadcrumb-item active" aria-current="page">New product</li>
@@ -93,13 +93,13 @@
                   <div class="col-lg-6">
                     <div class="form-group">
                       <label class="form-control-label" for="basePrice">Base price</label>
-                      <input type="number" min="1" id="basePrice" class="form-control" placeholder="Base price" name="buying_cost" value="{{ old('buying_cost') }}">
+                      <input type="number" min="1.00" step="0.01" id="basePrice" class="form-control" placeholder="Base price" name="buying_cost" value="{{ old('buying_cost') }}">
                     </div>
                   </div>
                   <div class="col-lg-6">
                     <div class="form-group">
                       <label class="form-control-label" for="sellingPrice">Selling price</label>
-                      <input type="number" min="1" id="sellingPrice" class="form-control" placeholder="Selling price" name="selling_cost" value="{{ old('selling_cost') }}">
+                      <input type="number" min="1.00" step="0.01" id="sellingPrice" class="form-control" placeholder="Selling price" name="selling_cost" value="{{ old('selling_cost') }}">
                     </div>
                   </div>
                 </div>

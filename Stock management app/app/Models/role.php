@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model
+class role extends Model
 {
     use HasFactory;
-
-    /**
+        /**
      * The model's default values for attributes.
      *
      * @var array
@@ -24,11 +23,7 @@ class Supplier extends Model
      * @var array
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'address',
-        'phone_number'
+        'role'
     ];
 
     /**
@@ -37,6 +32,7 @@ class Supplier extends Model
      * @var array
      */
     protected $hidden = [
+        
     ];
 
     /**
@@ -45,21 +41,14 @@ class Supplier extends Model
      * @var array
      */
     protected $casts = [
+       
     ];
 
     /**
-     * Get the products for this supplier.
+     * Get the products for this category.
      */
-    public function product()
+    public function users()
     {
-        return $this->hasOne(Product::class);
-    }
-
-    /**
-     * Get supplier address
-     */
-    public function address()
-    {
-        return $this->hasOne(Address::class);
+        return $this->belongsTo(User::class);
     }
 }

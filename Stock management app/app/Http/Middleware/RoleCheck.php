@@ -16,9 +16,11 @@ class RoleCheck
      */
     public function handle(Request $request, Closure $next)
     {
-        if( session('Role_id')  !== 1 ){
-            return abort(404);
+
+        if( session('user_role') !== 'Admin' ){ // role_id == 1 => admin
+            return abort(403); //Show an "forbidden" error page
         }
+
         return $next($request);
     }
 }

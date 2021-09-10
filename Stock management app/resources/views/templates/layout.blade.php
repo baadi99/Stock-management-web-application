@@ -47,7 +47,7 @@
           <ul class="navbar-nav">
             {{-- Check if the logged user is an admin. The isAdmin directive 
               is a custome blade directive the we defined in AppService Provider --}}
-            @isAdmin(session('Role_id'))
+            @isAdmin(session('user_role'))
                 <li class="nav-item">
                   <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-tachometer-alt text-primary"></i>
@@ -90,18 +90,6 @@
           <hr class="my-3">
           <!-- Navigation -->
           <ul class="navbar-nav mb-md-3">
-            <li class="nav-item">
-              <a class="nav-link" href="mailto:mohsin.baadi99@gmail.com" target="_blank">
-                <i class="ni ni-support-16"></i>
-                <span class="nav-link-text">Support</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" target="_blank">
-                <i class="ni ni-chart-pie-35"></i>
-                <span class="nav-link-text">Plugins</span>
-              </a>
-            </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ route('logout') }}">
                 <i class="ni ni-user-run"></i>
@@ -189,19 +177,6 @@
                   <i class="ni ni-single-02"></i>
                   <span>My profile</span>
                 </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-settings-gear-65"></i>
-                  <span>Settings</span>
-                </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-calendar-grid-58"></i>
-                  <span>Activity</span>
-                </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-support-16"></i>
-                  <span>Support</span>
-                </a>
-                <div class="dropdown-divider"></div>
                 <a href="{{ route('logout') }}" class="dropdown-item">
                   <i class="ni ni-user-run"></i>
                   <span>Logout</span>
