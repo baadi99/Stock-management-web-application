@@ -86,7 +86,7 @@
                   <div class="row">
                     <div class="col">
                       <h6 class="card-title text-uppercase text-muted mb-1">Current month profit</h6>
-                      <span class="h2 font-weight-bold mb-0">@moneyformat($currentMonthProfit)k</span>
+                      <span class="h2 font-weight-bold mb-0">@format_money($currentMonthProfit)</span>
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
@@ -157,6 +157,7 @@
                   <th scope="col">Date</th>
                   <th scope="col">Product</th>
                   <th scope="col">Quantity</th>
+                  <th scope="col">Total Price</th>
                   <th scope="col">Type</th>
                 </tr>
               </thead>
@@ -167,6 +168,7 @@
                       <td>{{ $shipment->date }}</td>
                       <td>{{ $shipment->product->label }}</td>
                       <td>{{ $shipment->quantity }}</td>
+                      <td>@format_money($shipment->total_price)</td>
                       <td>
                         @if($shipment->shipment_type->type == 'Outgoing')
                           <i class="fas fa-arrow-up text-info mr-3"></i> 

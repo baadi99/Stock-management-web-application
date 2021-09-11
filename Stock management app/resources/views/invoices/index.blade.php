@@ -56,7 +56,7 @@
                         <th>{{ $invoice->id }}</th>
                         <td>{{ $invoice->date }}</td>                              
                         <td>{{ $invoice->supplier->first_name.' '.$invoice->supplier->last_name }}</td>
-                        <td>&dollar;{{ $invoice->amount }}</td>
+                        <td> @format_money($invoice->amount)</td>
                         <td>
                           @if ($invoice->finalized == 0)
                               On hold

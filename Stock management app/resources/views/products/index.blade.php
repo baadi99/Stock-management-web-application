@@ -52,7 +52,7 @@
                         <td>{{ $product->label }}</td>                
                         <td class="d-block text-xs text-wrap" style="width:200px;">{{ $product->description }}</td>
                         <td>{{ $product->category->category }}</td>
-                        <td>&dollar;{{ $product->buying_cost }}/&dollar;{{ $product->selling_cost }}</td>
+                        <td> @format_money($product->buying_cost) / @format_money($product->selling_cost) </td>
                         <td>{{ $product->quantity }}</td>
                         <td>{{ $product->supplier->first_name." ".$product->supplier->last_name }}</td>
                         <td class="text-right">

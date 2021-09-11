@@ -14,7 +14,9 @@ class ShipmentController extends Controller
      * Displaying a list of the shipments
     */
     function index(){
-        $shipments = Shipment::orderBy('date', 'DESC')->paginate(4);
+        $shipments = Shipment::with(['product:id,label', 'shipment_type:id,type'])
+                                ->orderBy('date', 'DESC')
+                                ->paginate(4);
         return view('shipments.index', ['shipments' => $shipments]);
     }
 

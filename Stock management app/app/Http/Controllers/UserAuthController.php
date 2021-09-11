@@ -55,10 +55,19 @@ class UserAuthController extends Controller
      */
     function dashboard(){
         //Getting the dashboard data
+
+        //Total products in stock
         $totalProducts = Product::count(); 
+        //Products running out in stock
         $lowInStock = Product::where('quantity', '<=', 200)->count();
+        //Pending shipments
         $pendingShipments = Shipment::where('finalized', 0)->count();
-        $lastShipments = Shipment::where('finalized', 0)->orderByDesc('date')->limit(5)->get();
+        //Latest Shipments
+        $lastShipments = Shipment::with(['product:id,label', 'shipment_type:id,type']) //Eager load the model and only the specified columns of its relationship
+                                    ->where('finalized', 0)
+                                    ->take(5)
+                                    ->orderByDesc('date')
+                                    ->get();
         //Sales data :
         $currentMonthNbSales = Shipment::where('shipment_type_id', 2) 
                                         ->whereMonth('date', date('m'))
@@ -150,10 +159,11 @@ class UserAuthController extends Controller
         $currentYearProfits = collect([]); //A collection where we will store profits
         //Sales data :
         for($i = 1; $i <= 12; $i++){
-            $currentMonthSales = Shipment::where('shipment_type_id', 2)  // 2 = "Outgoing"
+            $currentMonthSales = Shipment::with('product:id,buying_cost')
+                                            ->where('shipment_type_id', 2)  // 2 = "Outgoing"
                                             ->whereMonth('date', $i)
                                             ->whereYear('date', date('Y'))
-                                            ->get();
+                                            ->get(['product_id', 'quantity', 'total_price']);
             
             //Calculating profit :
             $monthProfit = 0;
@@ -163,7 +173,7 @@ class UserAuthController extends Controller
                 foreach($currentMonthSales as $sale){
                     //in each sale we substract the base price(buying cost) from the total price
                     $monthProfit += ( $sale->total_price - ($sale->quantity * $sale->product->buying_cost) );
-                    $monthProfit = number_format($monthProfit/1000, 2); //The data will be displayed in the number k/M format(e.g : 10.0k/10M)
+                    //$monthProfit = number_format($monthProfit, 2); //The data will be displayed in the number k/M format(e.g : 10.0k/10M)
                 }   
             }
             //Append profit to profits collection
@@ -180,6 +190,8 @@ class UserAuthController extends Controller
     function calculateGrowth($lastMonthProfit, $currentMonthProfit){
 
         // Needs more handling when lastMonthProfit = 0 instead of just returning 1
-        return number_format((($currentMonthProfit - $lastMonthProfit)*100)/($lastMonthProfit || 1), 2);
+        $growth = $lastMonthProfit ? (($currentMonthProfit - $lastMonthProfit)*100)/$lastMonthProfit : 100;
+        return round($growth, 2);
     }
+
 }

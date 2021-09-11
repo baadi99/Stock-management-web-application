@@ -53,7 +53,7 @@
                         <td>{{ $shipment->shipment_type->type }}</td>                
                         <td>{{ $shipment->product->label }}</td>
                         <td>{{ $shipment->quantity }}</td>
-                        <td>&dollar;{{ $shipment->total_price }}</td>
+                        <td> @format_money($shipment->total_price) </td>
                         <td>
                           @if ($shipment->finalized == 0)
                               Pending
