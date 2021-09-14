@@ -29,8 +29,6 @@ class EmployeeController extends Controller
      * Store the newly added employee
      */
     function store(EmployeeRequest $request){
-        //Validating the request
-
         //create new user
         $employee = new User; 
 
